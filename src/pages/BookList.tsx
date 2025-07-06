@@ -1,9 +1,9 @@
 
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
 import { BookOpen, Edit, Eye, Trash2 } from 'lucide-react';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { toast } from "sonner";
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useDeleteBookMutation, useGetBooksQuery } from '../store/libraryApi';
 
@@ -11,22 +11,17 @@ const BookList: React.FC = () => {
   const { data: books, isLoading, error } = useGetBooksQuery();
   const [deleteBook] = useDeleteBookMutation();
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
-  const { toast } = useToast();
+
 
   const handleDelete = async (id: string) => {
     try {
       await deleteBook(id).unwrap();
-      toast({
-        title: "Success",
-        description: "Book deleted successfully",
-      });
+      
+      toast.success('Book deleted successfully');
       setDeleteConfirm(null);
     } catch {
-      toast({
-        title: "Error",
-        description: "Failed to delete book",
-        variant: "destructive",
-      });
+      
+      toast.error('Failed to delete book');
     }
   };
 

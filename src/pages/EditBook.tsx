@@ -3,9 +3,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "sonner";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { useGetBookQuery, useUpdateBookMutation } from "../store/libraryApi";
 
@@ -14,7 +14,7 @@ const EditBook: React.FC = () => {
   const navigate = useNavigate();
   const { data: book, isLoading: isLoadingBook } = useGetBookQuery(id!);
   const [updateBook, { isLoading: isUpdating }] = useUpdateBookMutation();
-  const { toast } = useToast();
+
 
   const [formData, setFormData] = useState({
     title: "",
@@ -34,12 +34,12 @@ const EditBook: React.FC = () => {
         genre: book.genre || "",
         isbn: book.isbn,
         description: book.description || "",
-        copies: book.copies,
-        available: book.available,
+        copies: book.copies as number,
+        available: book.available as boolean,
       });
     }
   }, [book]);
-  console.log('book', book);
+
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -60,27 +60,16 @@ const EditBook: React.FC = () => {
       !formData.genre ||
       !formData.isbn
     ) {
-      toast({
-        title: "Error",
-        description: "Please fill in all required fields",
-        variant: "destructive",
-      });
+      toast.error('Please fill in all required fields');
       return;
     }
 
     try {
       await updateBook({ id: id!, ...formData }).unwrap();
-      toast({
-        title: "Success",
-        description: "Book updated successfully",
-      });
+      toast.success('Book updated successfully');
       navigate(`/books/${id}`);
     } catch {
-      toast({
-        title: "Error",
-        description: "Failed to update book",
-        variant: "destructive",
-      });
+      toast.error('Failed to update book');
     }
   };
 

@@ -4,15 +4,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/hooks/use-toast';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from "sonner";
 import { useCreateBookMutation } from '../store/libraryApi';
 
 const CreateBook: React.FC = () => {
   const navigate = useNavigate();
   const [createBook, { isLoading }] = useCreateBookMutation();
-  const { toast } = useToast();
+
   
   const [formData, setFormData] = useState({
     title: '',
@@ -36,27 +36,17 @@ const CreateBook: React.FC = () => {
     e.preventDefault();
     
     if (!formData.title || !formData.author || !formData.genre || !formData.isbn) {
-      toast({
-        title: "Error",
-        description: "Please fill in all required fields",
-        variant: "destructive",
-      });
+      
+      toast.error('Please fill in all required fields');
       return;
     }
 
     try {
       await createBook(formData).unwrap();
-      toast({
-        title: "Success",
-        description: "Book created successfully",
-      });
+      toast.success('Book created successfully');
       navigate('/books');
     } catch {
-      toast({
-        title: "Error",
-        description: "Failed to create book",
-        variant: "destructive",
-      });
+      toast.error('Failed to create book');
     }
   };
 

@@ -17,7 +17,7 @@ function App() {
   return (
    <Provider store={store}>
       <TooltipProvider>
-        <Sonner />
+        <Sonner position="top-center"/>
         <BrowserRouter>
           <Layout>
             <Routes>

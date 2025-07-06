@@ -1,10 +1,9 @@
-
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'sonner';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useBorrowBookMutation, useGetBookQuery } from '../store/libraryApi';
 
@@ -13,8 +12,7 @@ const BorrowBook: React.FC = () => {
   const navigate = useNavigate();
   const { data: book, isLoading: isLoadingBook } = useGetBookQuery(bookId!);
   const [borrowBook, { isLoading: isBorrowing }] = useBorrowBookMutation();
-  const { toast } = useToast();
-  
+
   const [formData, setFormData] = useState({
     quantity: 1,
     dueDate: '',
@@ -40,22 +38,14 @@ const BorrowBook: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.quantity || !formData.dueDate) {
-      toast({
-        title: "Error",
-        description: "Please fill in all fields",
-        variant: "destructive",
-      });
+      toast.error('Please fill in all fields');
       return;
     }
 
     if (formData.quantity > (book?.copies || 0)) {
-      toast({
-        title: "Error",
-        description: "Quantity exceeds available copies",
-        variant: "destructive",
-      });
+      toast.error('Quantity exceeds available copies');
       return;
     }
 
@@ -65,24 +55,22 @@ const BorrowBook: React.FC = () => {
         quantity: formData.quantity,
         dueDate: new Date(formData.dueDate).toISOString(),
       }).unwrap();
-      
-      toast({
-        title: "Success",
-        description: "Book borrowed successfully",
-      });
+
+      toast.success('Book borrowed successfully');
       navigate('/borrow-summary');
     } catch {
-      toast({
-        title: "Error",
-        description: "Failed to borrow book",
-        variant: "destructive",
-      });
+      toast.error('Failed to borrow book');
     }
   };
 
   if (isLoadingBook) return <LoadingSpinner />;
   if (!book) return <div className="text-center py-8">Book not found</div>;
-  if (!book.available) return <div className="text-center py-8">This book is not available for borrowing</div>;
+  if (!book.available)
+    return (
+      <div className="text-center py-8">
+        This book is not available for borrowing
+      </div>
+    );
 
   return (
     <div className=" max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8  h-[calc(100vh-15.5rem)] flex justify-center items-center">
@@ -151,3 +139,4 @@ const BorrowBook: React.FC = () => {
 };
 
 export default BorrowBook;
+
